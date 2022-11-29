@@ -15,10 +15,14 @@ import (
 //var sc = bufio.NewScanner(os.Stdin)
 
 func sendMessage(s *discordgo.Session, channelID, message string) {
-	_, err := s.ChannelMessageSend(channelID, message)
+	err := s.MessageReactionAdd(channelID, message, "👀")
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = s.ChannelMessageSend(channelID, message)
 	log.Println(">>> " + message)
 	if err != nil {
-		log.Println("Error sending message: ", err)
+		log.Println("Error sending message or reaction: ", err)
 	}
 }
 

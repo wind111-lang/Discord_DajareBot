@@ -15,14 +15,14 @@ import (
 //var sc = bufio.NewScanner(os.Stdin)
 
 func sendMessage(s *discordgo.Session, channelID, message string) {
-	err := s.MessageReactionAdd(channelID, message, "👀")
-	if err != nil {
-		fmt.Println(err)
-	}
-	_, err = s.ChannelMessageSend(channelID, message)
+	_, err := s.ChannelMessageSend(channelID, message)
 	log.Println(">>> " + message)
 	if err != nil {
-		log.Println("Error sending message or reaction: ", err)
+		log.Println("Error sending message or : ", err)
+	}
+	err = s.MessageReactionAdd(channelID, message, "👀")
+	if err != nil {
+		log.Println("Error reaction message:", err)
 	}
 }
 
@@ -34,7 +34,6 @@ func sendMessage(s *discordgo.Session, channelID, message string) {
 // }
 
 func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	clientId := os.Getenv("CLIENT_ID")
 	u := m.Author
 	fmt.Printf("%20s %20s(%20s) > %s\n", m.ChannelID, u.Username, u.ID, m.Content)
 	if u.ID != clientId {
@@ -49,6 +48,13 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
+var token = os.Getenv("DISCORD_TOKEN")
+var clientId = os.Getenv("CLIENT_ID")
+
+func init() {
+	fmt.Println(token, clientId)
+}
+
 func main() {
 
 	//var a string
@@ -56,8 +62,6 @@ func main() {
 	// if enverr != nil {
 	// 	panic("Error loading .env file")
 	// }
-
-	token := os.Getenv("DISCORD_TOKEN")
 
 	discord, err := discordgo.New("Bot " + token)
 	if err != nil {
@@ -67,7 +71,7 @@ func main() {
 
 	err = discord.Open()
 	if err != nil {
-		log.Fatal("Error opening Discord: ", err)
+		log.Fatal("Error opening Discord session!: ", err)
 	}
 
 	stopBot := make(chan os.Signal, 1)

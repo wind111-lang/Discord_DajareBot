@@ -36,6 +36,7 @@ func sendMessage(s *discordgo.Session, channelID, message string) {
 func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	u := m.Author
 	fmt.Printf("%20s %20s(%20s) > %s\n", m.ChannelID, u.Username, u.ID, m.Content)
+	clientId := os.Getenv("CLIENT_ID")
 	if u.ID != clientId {
 		dajare, _ := dajarep.Dajarep(m.Content)
 		//fmt.Println(dajare)
@@ -48,20 +49,15 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-var token = os.Getenv("DISCORD_TOKEN")
-var clientId = os.Getenv("CLIENT_ID")
-
-func init() {
-	fmt.Println(token, clientId)
-}
-
 func main() {
 
 	//var a string
-	//enverr := godotenv.Load(fmt.Sprint(".env"))
+	// enverr := godotenv.Load(fmt.Sprint(".env"))
 	// if enverr != nil {
 	// 	panic("Error loading .env file")
 	// }
+
+	token := os.Getenv("DISCORD_TOKEN")
 
 	discord, err := discordgo.New("Bot " + token)
 	if err != nil {

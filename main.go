@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	_ "net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,23 +16,14 @@ import (
 //var sc = bufio.NewScanner(os.Stdin)
 
 func sendMessage(s *discordgo.Session, channelID, message string) {
+	//var r *discordgo.MessageReactionAdd
 	_, err := s.ChannelMessageSend(channelID, message)
 	log.Println(">>> " + message)
 	if err != nil {
 		log.Println("Error sending message or : ", err)
 	}
-	err = s.MessageReactionAdd(channelID, message, "👀")
-	if err != nil {
-		log.Println("Error reaction message:", err)
-	}
+	return
 }
-
-// func sendReply(s *discordgo.Session, channelID, message string, reference *discordgo.MessageReference) {
-// 	_, err := s.ChannelMessageSendReply(channelID, message, reference)
-// 	if err != nil {
-// 		log.Fatal("Error sending message: ", err)
-// 	}
-// }
 
 func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	u := m.Author
@@ -42,21 +34,16 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//fmt.Println(dajare)
 
 		if len(dajare) > 0 {
-
+			err := s.MessageReactionAdd(m.ChannelID, m.Message.ID, "👀")
+			if err != nil {
+				log.Println(err)
+			}
 			sendMessage(s, m.ChannelID, u.Mention()+"なんか言ってるねえ -> "+m.Content)
-			//sendReply(s, m.ChannelID, "対象:"+m.Content, m.Reference())
 		}
 	}
 }
 
 func main() {
-
-	//var a string
-	// enverr := godotenv.Load(fmt.Sprint(".env"))
-	// if enverr != nil {
-	// 	panic("Error loading .env file")
-	// }
-
 	token := os.Getenv("DISCORD_TOKEN")
 
 	discord, err := discordgo.New("Bot " + token)
@@ -80,3 +67,8 @@ func main() {
 	}
 	return
 }
+
+// func main() {
+// 	http.HandleFunc("/", bot)
+// 	http.ListenAndServe(":8080", nil)
+// }
